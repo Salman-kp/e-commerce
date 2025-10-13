@@ -1,12 +1,18 @@
-<section class="products">
-    <div class="container">
-        <h2>Our Products</h2>
-        <div class="products-grid">
-            <div class="product-item">
-                <img src="/static/images/product1.jpg" alt="Product 1">
-                <h3>Product 1</h3>
-                <p>$25.00</p>
-            </div>
-        </div>
-    </div>
-</section>
+{{ define "content" }}
+<h1>Products</h1>
+<button class="add-btn">+ Add Product</button>
+<table>
+  <thead>
+    <tr><th>ID</th><th>Image</th><th>Name</th><th>Description</th><th>Price</th><th>Stock</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td><td><img src="/static/images/headphone.png" width="40"></td>
+      <td>Noise Cancelling Headphones</td>
+      <td>Over-ear Bluetooth headphones</td>
+      <td>₹1999</td><td>34</td>
+    </tr>
+  </tbody>
+</table>
+{{ end }}
+{{ template "base" . }}

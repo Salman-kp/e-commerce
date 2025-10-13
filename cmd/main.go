@@ -3,33 +3,32 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	"e-commerce/config"
+	"e-commerce/routes"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// Connect to database
+	// Connect to DB
 	config.ConnectDatabase()
-	//Auto migrate all models
 	config.MigrateAll()
 
 	// Create router
 	router := gin.Default()
-
-	// Load HTML templates and static files
-	router.LoadHTMLGlob("templates/*")
-	router.Static("/static", "./static")
-
-	// Root route (renders homepage)
-	router.GET("/home", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{
-			"title": "E-Commerce Home",
-			"msg":   "Welcome to E-Commerce 🚀",
-		})
+   
+	// Make DB accessible in handlers via context if desired
+	router.Use(func(c *gin.Context) {
+		c.Set("db", config.DB)
+		c.Next()
 	})
+	// Load templates & static
+	router.Static("/static", "./static")
+	router.LoadHTMLGlob("templates/**/*")
+   
+	routes.AuthRoutes(router)
 
 	// Server port from .env
 	port := os.Getenv("PORT")

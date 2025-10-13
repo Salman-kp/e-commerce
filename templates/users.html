@@ -1,0 +1,13 @@
+{{ define "content" }}
+<h1>Users</h1>
+<table>
+  <thead>
+    <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>Sophia Wilson</td><td>sophia@example.com</td><td>User</td><td>Active</td></tr>
+    <tr><td>2</td><td>David Miller</td><td>david@example.com</td><td>User</td><td>Active</td></tr>
+  </tbody>
+</table>
+{{ end }}
+{{ template "base" . }}
