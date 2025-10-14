@@ -71,7 +71,9 @@ func LoginService(db *gorm.DB, email, password string) (string, string, error) {
 	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
 		return "", "", errors.New("user not found")
 	}
-
+    if user.IsBlocked {
+		return "", "", errors.New("account is blocked")
+	}
 	if !utils.CheckPasswordHash(password, user.PasswordHash) {
 		return "", "", errors.New("invalid credentials")
 	}

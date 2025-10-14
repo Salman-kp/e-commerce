@@ -29,6 +29,7 @@ func main() {
 	router.LoadHTMLGlob("templates/**/*")
    
 	routes.AuthRoutes(router)
+    routes.UserRoutes(router)
 
 	// Server port from .env
 	port := os.Getenv("PORT")

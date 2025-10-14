@@ -47,10 +47,12 @@ func LoginHandler(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
+     //Set refresh in cookie 
+	c.SetCookie("refresh_token", refresh,7*24*60*60,"/","localhost",false,true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"access_token":  access,
-		"refresh_token": refresh,
+		"message":      "Login successful 🚀",
 	})
 }
 
@@ -149,15 +151,13 @@ func ResetPasswordHandler(c *gin.Context) {
 
 // ------------------ REFRESH TOKEN ------------------
 func RefreshTokenHandler(c *gin.Context) {
-	var body struct {
-		Token string `json:"refresh_token" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&body); err != nil {
+	refreshToken, err := c.Cookie("refresh_token")
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	newToken, err := services.RefreshService(config.DB, body.Token)
+	newToken, err := services.RefreshService(config.DB,refreshToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
@@ -168,17 +168,18 @@ func RefreshTokenHandler(c *gin.Context) {
 
 // ------------------ LOGOUT ------------------
 func LogoutHandler(c *gin.Context) {
-	var body struct {
-		Token string `json:"refresh_token" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&body); err != nil {
+	refreshToken, err := c.Cookie("refresh_token")
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := services.LogoutService(config.DB, body.Token); err != nil {
+	if err := services.LogoutService(config.DB,refreshToken); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	
+	// Delete cookie
+	c.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
