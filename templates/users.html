@@ -1,13 +1,29 @@
-{{ define "content" }}
-<h1>Users</h1>
-<table>
-  <thead>
-    <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>1</td><td>Sophia Wilson</td><td>sophia@example.com</td><td>User</td><td>Active</td></tr>
-    <tr><td>2</td><td>David Miller</td><td>david@example.com</td><td>User</td><td>Active</td></tr>
-  </tbody>
-</table>
-{{ end }}
-{{ template "base" . }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ .title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body{margin:0;font-family:Arial,sans-serif;display:flex;background:#f4f6f9;}
+    .content{flex-grow:1;padding:30px;margin-left:240px;}
+    h1{margin-bottom:25px;color:#1e293b;}
+    table{width:100%;border-collapse:collapse;background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+    th,td{padding:12px;text-align:left;border-bottom:1px solid #ddd;}
+    th{background:#2563eb;color:white;}
+    tr:hover{background:#f1f5f9;}
+    @media(max-width:768px){.content{margin-left:0;padding:20px;} table{font-size:14px;}}
+  </style>
+</head>
+<body>
+  {{ template "sidebar" . }}
+  <div class="content">
+    <h1>Users List</h1>
+    <table>
+      <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th></tr>
+      <tr><td>1</td><td>John Doe</td><td>john@example.com</td><td>Admin</td></tr>
+      <tr><td>2</td><td>Jane Smith</td><td>jane@example.com</td><td>User</td></tr>
+    </table>
+  </div>
+</body>
+</html>

@@ -33,26 +33,50 @@ func SignupHandler(c *gin.Context) {
 
 // ------------------ LOGIN ------------------
 func LoginHandler(c *gin.Context) {
-	var body struct {
-		Email    string `json:"email" binding:"required,email"`
-		Password string `json:"password" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	// var body struct {
+	// 	Email    string `json:"email" binding:"required,email"`
+	// 	Password string `json:"password" binding:"required"`
+	// }
+	// if err := c.ShouldBindJSON(&body); err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// 	return
+	// }
+	// accessToken, refreshToken, role, err := services.LoginService(config.DB, body.Email, body.Password)
+	// if err != nil {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+	// 	return
+	// }
 
-	access, refresh, err := services.LoginService(config.DB, body.Email, body.Password)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+	email := c.PostForm("email")
+	password := c.PostForm("password")
+    
+	if email == "" || password == "" {
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{
+			"title": "Login Page",
+			"error": "⚠️ Email and password cannot be empty",
+		})
 		return
 	}
-     //Set refresh in cookie 
-	c.SetCookie("refresh_token", refresh,7*24*60*60,"/","localhost",false,true)
+	
+	accessToken, refreshToken, role, err := services.LoginService(config.DB, email, password)
+	if err != nil {
+		c.HTML(http.StatusUnauthorized, "login.html", gin.H{
+			"title": "Login Page",
+			"error": "❌ Invalid email or password",
+		})
+		return
+	}
+	//Set refresh in cookie
+	c.SetCookie("refresh_token", refreshToken, 7*24*60*60, "/", "localhost", false, true)
+	
+	if role == "admin" {
+		c.Redirect(http.StatusSeeOther, "/view/dashboard")
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"access_token":  access,
 		"message":      "Login successful 🚀",
+		"access_token": accessToken,
 	})
 }
 
@@ -78,7 +102,6 @@ func SendOTPHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "OTP sent successfully"})
 }
-
 
 func VerifyOTPHandler(c *gin.Context) {
 	var body struct {
@@ -157,7 +180,7 @@ func RefreshTokenHandler(c *gin.Context) {
 		return
 	}
 
-	newToken, err := services.RefreshService(config.DB,refreshToken)
+	newToken, err := services.RefreshService(config.DB, refreshToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
@@ -174,11 +197,11 @@ func LogoutHandler(c *gin.Context) {
 		return
 	}
 
-	if err := services.LogoutService(config.DB,refreshToken); err != nil {
+	if err := services.LogoutService(config.DB, refreshToken); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	// Delete cookie
 	c.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})

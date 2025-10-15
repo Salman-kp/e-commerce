@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"e-commerce/config"
@@ -20,17 +21,26 @@ func main() {
 	router := gin.Default()
    
 	// Make DB accessible in handlers via context if desired
-	router.Use(func(c *gin.Context) {
-		c.Set("db", config.DB)
-		c.Next()
-	})
+	// router.Use(func(c *gin.Context) {
+	// 	c.Set("db", config.DB)
+	// 	c.Next()
+	// })
+
 	// Load templates & static
-	router.Static("/static", "./static")
-	router.LoadHTMLGlob("templates/**/*")
+	//router.Static("/static", "./static")
+	router.LoadHTMLGlob("templates/*")
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/view/login")
+	})
    
 	routes.AuthRoutes(router)
     routes.UserRoutes(router)
+	routes.AdminRoutes(router)
+    routes.AdminViewRoutes(router)
 
+
+
+	
 	// Server port from .env
 	port := os.Getenv("PORT")
 	if port == "" {

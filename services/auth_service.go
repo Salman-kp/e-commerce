@@ -63,40 +63,40 @@ func SignupService(db *gorm.DB, fullName, email, password string) error {
 }
 
 // ---------- Login ----------
-func LoginService(db *gorm.DB, email, password string) (string, string, error) {
+func LoginService(db *gorm.DB, email, password string) (string, string,string, error) {
 	// cleanup expired refresh tokens (optional housekeeping)
 	db.Where("expires_at < ?", time.Now()).Delete(&models.RefreshToken{})
 
 	var user models.User
 	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
-		return "", "", errors.New("user not found")
+		return "", "","", errors.New("user not found")
 	}
     if user.IsBlocked {
-		return "", "", errors.New("account is blocked")
+		return "", "","", errors.New("account is blocked")
 	}
 	if !utils.CheckPasswordHash(password, user.PasswordHash) {
-		return "", "", errors.New("invalid credentials")
+		return "", "","", errors.New("invalid credentials")
 	}
 
 	if !user.IsVerified {
-		return "", "", errors.New("email not verified")
+		return "", "","", errors.New("email not verified")
 	}
 
 	accessToken, err := utils.GenerateJWT(int(user.ID), user.Role)
 	if err != nil {
-		return "", "", errors.New("failed to generate access token")
+		return "", "", "",errors.New("failed to generate access token")
 	}
 
 	refreshPlain, hashedToken, err := utils.GenerateRefreshToken()
 	if err != nil {
-		return "", "", errors.New("failed to generate refresh token")
+		return "", "","", errors.New("failed to generate refresh token")
 	}
 
 	if err := utils.SaveRefreshToken(db, user.ID, hashedToken, time.Now().Add(7*24*time.Hour)); err != nil {
-		return "", "", errors.New("failed to save refresh token")
+		return "", "","", errors.New("failed to save refresh token")
 	}
 
-	return accessToken, refreshPlain, nil
+	return accessToken, refreshPlain,user.Role, nil
 }
 
 // ---------- Forgot Password ----------

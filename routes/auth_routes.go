@@ -1,12 +1,12 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"e-commerce/controllers"
+	"github.com/gin-gonic/gin"
 )
 
 func AuthRoutes(r *gin.Engine) {
-	
+
 	auth := r.Group("/auth")
 	{
 		auth.POST("/signup", controllers.SignupHandler)
