@@ -1,30 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ .title }}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { margin:0; font-family: Arial,sans-serif; display:flex; background:#f4f6f9; }
-    .content { flex-grow:1; padding:30px; margin-left:240px; }
-    h1 { margin-bottom:25px; color:#1e293b; }
-    .dashboard { display:flex; flex-wrap:wrap; gap:20px; }
-    .card { background:white; padding:25px; border-radius:12px; flex:1 1 260px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:0.2s; }
-    .card:hover { transform:translateY(-3px); box-shadow:0 4px 12px rgba(0,0,0,0.12); }
-    .card h3 { color:#334155; margin-bottom:10px; }
-    .card p { font-size:22px; color:#2563eb; font-weight:600; margin:0; }
-    @media(max-width:768px){ .content{ margin-left:0; padding:20px; } }
-  </style>
-</head>
-<body>
-{{ template "sidebar" . }}
-  <div class="content">
-    <h1>Dashboard</h1>
-    <div class="dashboard">
-      <div class="card"><h3>Total Users</h3><p>7</p></div>
-      <div class="card"><h3>Total Products</h3><p>22</p></div>
-      <div class="card"><h3>Total Orders</h3><p>4</p></div>
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ .title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /* --- Base layout --- */
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        background: #f4f6f9;
+        min-height: 100vh;
+      }
+
+      /* --- Content area --- */
+      .content {
+        flex-grow: 1;
+        padding: 30px;
+        margin-left: 260px; /* space from sidebar */
+        transition: all 0.3s ease;
+      }
+
+      h1 {
+        margin-bottom: 25px;
+        color: #1e293b;
+      }
+
+      /* --- Dashboard layout (responsive grid) --- */
+      .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        width: 100%;
+      }
+
+      /* --- Card style --- */
+      .card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      }
+
+      .card h3 {
+        color: #334155;
+        margin-bottom: 10px;
+      }
+
+      .card p {
+        font-size: 22px;
+        color: #2563eb;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      /* --- Medium screens (tablets) --- */
+      @media (max-width: 1024px) {
+        .content {
+          margin-left: 200px;
+          padding: 25px;
+        }
+        .dashboard {
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+      }
+
+      /* --- Small screens (mobiles) --- */
+      @media (max-width: 768px) {
+        body {
+          flex-direction: column;
+        }
+
+        .content {
+          margin-left: 0;
+          padding: 20px;
+        }
+
+        .dashboard {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+      }
+
+      /* --- Very small screens --- */
+      @media (max-width: 480px) {
+        .content {
+          padding: 15px;
+        }
+
+        .card {
+          padding: 20px;
+        }
+
+        .card p {
+          font-size: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {{ template "sidebar" . }}
+    <div class="content">
+      <h1>Dashboard</h1>
+      <!-- <pre>{{ printf "%#v" . }}</pre> -->
+      <div class="dashboard">
+        <div class="card">
+          <h3>Total Users</h3>
+          <p>{{ .total_users }}</p>
+        </div>
+        <div class="card">
+          <h3>Total Products</h3>
+          <p>0</p>
+        </div>
+        <div class="card">
+          <h3>Total Orders</h3>
+          <p>0</p>
+        </div>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>
