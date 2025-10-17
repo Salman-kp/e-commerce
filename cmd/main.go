@@ -37,7 +37,7 @@ func main() {
     routes.UserRoutes(router)
 	routes.AdminRoutes(router)
     routes.AdminViewRoutes(router)
-
+    routes.ProductRoutes(router)
 
 
 	

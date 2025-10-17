@@ -14,9 +14,14 @@ func ProductRoutes(r *gin.Engine) {
 		admin.POST("/products", controllers.CreateProductHandler)
 	    admin.PUT("/products/:id", controllers.UpdateProductHandler)
 		admin.DELETE("/products/:id", controllers.DeleteProductHandler)
-	    admin.POST("/products/:id/production", controllers.StartProductionHandler)              // start production route
-		admin.PUT("/products/:id/production/status", controllers.UpdateProductionStatusHandler) // update production status route
-		admin.GET("/products/:id/production", controllers.GetProductionDetailsHandler)          // get production details route
-		admin.GET("/products/production", controllers.GetAllProductionsHandler)                 // get all productions route
+	    admin.POST("/products/:id/production", controllers.StartProductionHandler)              
+		admin.PUT("/products/:id/production/status", controllers.UpdateProductionStatusHandler) 
+		admin.GET("/products/:id/production", controllers.GetProductionDetailsHandler)          
+		admin.GET("/products/production", controllers.GetAllProductionsHandler)               
+	}
+	public := r.Group("/products")
+	{
+		public.GET("", controllers.GetProductsHandler)
+		public.GET("/:id", controllers.GetProductByIDHandler)
 	}
 }

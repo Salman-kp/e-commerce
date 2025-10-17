@@ -49,7 +49,7 @@ func LoginHandler(c *gin.Context) {
 
 	email := c.PostForm("email")
 	password := c.PostForm("password")
-    
+
 	if email == "" || password == "" {
 		c.HTML(http.StatusBadRequest, "login.html", gin.H{
 			"title": "Login Page",
@@ -57,7 +57,7 @@ func LoginHandler(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	accessToken, refreshToken, role, err := services.LoginService(config.DB, email, password)
 	if err != nil {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{
@@ -68,9 +68,13 @@ func LoginHandler(c *gin.Context) {
 	}
 	//Set refresh in cookie
 	c.SetCookie("refresh_token", refreshToken, 7*24*60*60, "/", "localhost", false, true)
-	
+
 	if role == "admin" {
 		c.Redirect(http.StatusSeeOther, "/view/dashboard")
+		c.JSON(http.StatusOK, gin.H{
+			"message":      "Login successful 🚀",
+			"access_token": accessToken,
+		})
 		return
 	}
 
