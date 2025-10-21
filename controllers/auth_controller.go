@@ -6,6 +6,7 @@ import (
 	"e-commerce/config"
 	"e-commerce/models"
 	"e-commerce/services"
+	"e-commerce/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -58,7 +59,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, role, err := services.LoginService(config.DB, email, password)
+	accessToken, role, err := services.LoginService(config.DB, email, password)
 	if err != nil {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{
 			"title": "Login Page",
@@ -66,21 +67,17 @@ func LoginHandler(c *gin.Context) {
 		})
 		return
 	}
-	//Set refresh in cookie
-	c.SetCookie("refresh_token", refreshToken, 7*24*60*60, "/", "localhost", false, true)
-
+	//Set accessToken in cookie
+	c.SetCookie("access_token", accessToken, 30*60, "/", "localhost", false, true) // 30 minutes
+	
 	if role == "admin" {
 		c.Redirect(http.StatusSeeOther, "/view/dashboard")
-		c.JSON(http.StatusOK, gin.H{
-			"message":      "Login successful 🚀",
-			"access_token": accessToken,
-		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":      "Login successful 🚀",
-		"access_token": accessToken,
+	c.HTML(http.StatusOK, "login.html", gin.H{
+		"title": "Login Page",
+		"error": "❌ Only admin users are allowed",
 	})
 }
 
@@ -178,35 +175,52 @@ func ResetPasswordHandler(c *gin.Context) {
 
 // ------------------ REFRESH TOKEN ------------------
 func RefreshTokenHandler(c *gin.Context) {
-	refreshToken, err := c.Cookie("refresh_token")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	accessToken, err := c.Cookie("access_token")
+	if err != nil || accessToken == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing access token"})
 		return
 	}
 
-	newToken, err := services.RefreshService(config.DB, refreshToken)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+	userID, _, err := utils.ValidateJWT(accessToken)
+	if err == nil {
+		c.JSON(http.StatusOK, gin.H{"access_token": accessToken})
 		return
 	}
 
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Please login again"})
+		return
+	}
+
+	newToken, err := services.RefreshService(config.DB, uint(userID))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Please login again"})
+		return
+	}
+
+	c.SetCookie("access_token", newToken, 30*60, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{"access_token": newToken})
 }
 
 // ------------------ LOGOUT ------------------
 func LogoutHandler(c *gin.Context) {
-	refreshToken, err := c.Cookie("refresh_token")
-	if err != nil {
+	accessToken, err := c.Cookie("access_token")
+	if err != nil || accessToken == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing access token"})
+		return
+	}
+
+	userID, _, err := utils.ValidateJWT(accessToken)
+	if err != nil || userID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid access token"})
+		return
+	}
+
+	if err := services.LogoutService(config.DB, uint(userID)); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := services.LogoutService(config.DB, refreshToken); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Delete cookie
-	c.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)
+	c.SetCookie("access_token", "", -1, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }

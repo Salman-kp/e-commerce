@@ -30,7 +30,7 @@ func main() {
 	//router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*")
 	router.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusFound, "/view/login")
+		c.Redirect(http.StatusFound, "/login")
 	})
    
 	routes.AuthRoutes(router)
@@ -38,7 +38,7 @@ func main() {
 	routes.AdminRoutes(router)
     routes.AdminViewRoutes(router)
     routes.ProductRoutes(router)
-
+    routes.WishlistRoutes(router)
 
 	
 	// Server port from .env
