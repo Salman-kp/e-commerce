@@ -39,7 +39,7 @@ func main() {
     routes.AdminViewRoutes(router)
     routes.ProductRoutes(router)
     routes.WishlistRoutes(router)
-
+    routes.CartRoutes(router)
 	
 	// Server port from .env
 	port := os.Getenv("PORT")
