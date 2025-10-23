@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"e-commerce/config"
+	"e-commerce/controllers"
 	"e-commerce/routes"
 
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,7 @@ func main() {
 	// Load templates & static
 	//router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*")
+	router.Use(controllers.MethodOverride())
 	router.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/login")
 	})

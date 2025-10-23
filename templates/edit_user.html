@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ .title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+   * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.edit-container {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+h2 {
+  font-size: 32px;
+  color: #1a202c;
+  margin-bottom: 30px;
+  font-weight: 700;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: -12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+input[type="text"],
+select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #2d3748;
+  background: white;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+input[type="text"]:focus,
+select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+}
+
+input[type="text"]:hover,
+select:hover {
+  border-color: #cbd5e0;
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232d3748' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+button[type="button"] {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+button[type="button"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+button[type="button"]:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .edit-container {
+    padding: 30px 20px;
+  }
+
+  h2 {
+    font-size: 26px;
+    margin-bottom: 25px;
+  }
+
+  label {
+    font-size: 13px;
+  }
+
+  input[type="text"],
+  select {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  button[type="button"] {
+    padding: 14px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 15px;
+  }
+
+  .edit-container {
+    padding: 25px 15px;
+    border-radius: 16px;
+  }
+
+  h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  form {
+    gap: 16px;
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="edit-container">
+    <h2>Edit User</h2>
+    <form id="editUserForm">
+      <label>Full Name</label>
+      <input type="text" name="full_name" value="{{ .user.FullName }}">
+
+      <label>Role</label>
+      <select name="role">
+        <option value="user" {{ if eq .user.Role "user" }}selected{{ end }}>User</option>
+        <option value="admin" {{ if eq .user.Role "admin" }}selected{{ end }}>Admin</option>
+      </select>
+
+      <label>Address</label>
+      <input type="text" name="address" value="{{ .user.Address }}">
+
+      <label>Avatar URL</label>
+      <input type="text" name="avatar_url" value="{{ if .user.AvatarURL }}{{ .user.AvatarURL }}{{ end }}">
+
+      <button type="button" onclick="submitForm()">Update User</button>
+    </form>
+  </div>
+
+  <script>
+    function submitForm() {
+      const form = document.getElementById('editUserForm');
+      const data = new URLSearchParams(new FormData(form));
+
+      fetch('/admin/users/{{.user.ID}}', {
+        method: 'PUT',
+        body: data
+      }).then(res => {
+        if(res.redirected){
+          window.location.href = res.url;
+        } else {
+          alert('Failed to update user');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
