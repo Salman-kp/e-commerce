@@ -45,9 +45,11 @@ func ShowDashboard(c *gin.Context) {
 // ---------------- USERS ----------------
 func ShowUsersPage(c *gin.Context) {
 	var users []models.User
-	if err := config.DB.Find(&users).Error; err != nil {
-		users = []models.User{}
+	if err := config.DB.Order("id ASC").Find(&users).Error; err != nil {
+		c.HTML(http.StatusInternalServerError, "users.html", gin.H{"error": "Failed to fetch users"})
+		return
 	}
+
 	c.HTML(http.StatusOK, "users.html", gin.H{
 		"title":  "Manage Users",
 		"users":  users,
@@ -75,13 +77,53 @@ func ShowEditUserPage(c *gin.Context) {
 	})
 }
 
+
+
+
 // ---------------- PRODUCTS ----------------
 func ShowProductsPage(c *gin.Context) {
+	var products []models.Product
+	if err := config.DB.Order("id ASC").Find(&products).Error; err != nil {
+		products = []models.Product{}
+	}
+
 	c.HTML(http.StatusOK, "products.html", gin.H{
-		"title":  "Products Page",
-		"Active": "products",
+		"title":    "Manage Products",
+		"products": products,
+		"Active":   "products",
 	})
 }
+
+
+// ---------------- CREATE PRODUCT PAGE ----------------
+func ShowCreateProductPage(c *gin.Context) {
+	c.HTML(http.StatusOK, "create_product.html", gin.H{
+		"title": "Add Product",
+	})
+}
+
+// ---------------- EDIT PRODUCT PAGE ----------------
+func ShowEditProductPage(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid product ID")
+		return
+	}
+
+	var product models.Product
+	if err := config.DB.First(&product, id).Error; err != nil {
+		c.String(http.StatusNotFound, "Product not found")
+		return
+	}
+
+	c.HTML(http.StatusOK, "edit_product.html", gin.H{
+		"title":   "Edit Product",
+		"product": product,
+	})
+}
+
+
+
 
 // ---------------- ORDERS ----------------
 func ShowOrdersPage(c *gin.Context) {

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Product</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family:'Inter', sans-serif;
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+    }
+
+    .container {
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      padding: 20px 25px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a202c;
+      text-align:center;
+      margin-bottom:15px;
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+
+    form {
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    label {
+      font-size:13px;
+      font-weight:600;
+      color:#2d3748;
+    }
+
+    input[type="text"], input[type="number"], textarea {
+      width:100%;
+      padding:8px 10px;
+      border:1.5px solid #e2e8f0;
+      border-radius:8px;
+      font-size:14px;
+    }
+
+    button[type="button"] {
+      width:100%;
+      padding:12px;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color:white;
+      border:none;
+      border-radius:8px;
+      font-weight:600;
+      cursor:pointer;
+      margin-top:5px;
+    }
+
+    button[type="button"]:hover {
+      opacity:0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Edit Product</h2>
+    <form id="editProductForm">
+      <input type="hidden" name="ID" value="{{ .product.ID }}">
+
+      <label>Name</label>
+      <input type="text" name="Name" value="{{ .product.Name }}" required>
+
+      <label>Description</label>
+      <textarea name="Description" rows="2" required>{{ .product.Description }}</textarea>
+
+      <label>Price</label>
+      <input type="number" name="Price" value="{{ .product.Price }}" required>
+
+      <label>Stock Quantity</label>
+      <input type="number" name="StockQuantity" value="{{ .product.StockQuantity }}" required>
+
+      <label>Category</label>
+      <input type="text" name="Category" value="{{ .product.Category }}" required>
+
+      <label>Image URL</label>
+      <input type="text" name="ImageURL" value="{{ .product.ImageURL }}" required>
+
+      <button type="button" onclick="submitForm()">Update Product</button>
+    </form>
+  </div>
+
+  <script>
+    function submitForm(){
+      const form = document.getElementById('editProductForm');
+      const id = form.ID.value;
+      const data = new URLSearchParams(new FormData(form));
+      fetch(`/admin/products/${id}`, { method:'PUT', body:data })
+      .then(res=>{
+        if(res.ok) window.location.href='/view/products';
+        else alert('Failed to update product');
+      });
+    }
+  </script>
+</body>
+</html>

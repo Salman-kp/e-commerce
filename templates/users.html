@@ -4,217 +4,356 @@
     <meta charset="UTF-8" />
     <title>{{ .title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-}
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .content {
+        margin-left: 250px;
+        padding: 10px;
+        min-height: 100vh;
+      }
 
-.content {
-  margin-left: 250px; /* Adjust based on your sidebar width */
-  padding: 10px;
-  min-height: 100vh;
-}
+      h1 {
+        font-size: 28px;
+        color: #ffffff;
+        margin-bottom: 30px;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      }
 
-h1 {
-  font-size: 32px;
-  color: #ffffff;
-  margin-bottom: 30px;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+      /* Table */
+      table {
+        width: 100%;
+        max-width: 1500px;
+        margin: 0 auto;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        table-layout: fixed;
+      }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
+      /* Table Head */
+      thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
 
-thead {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
+      th {
+        padding: 18px 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-th {
-  padding: 18px 16px;
-  text-align: left;
-  font-weight: 600;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+      /* Column Widths */
+      th:nth-child(1),
+      td:nth-child(1) {
+        /* ID */
+        width: 5%;
+        min-width: 50px;
+      }
 
-tbody tr {
-  border-bottom: 1px solid #f7fafc;
-  transition: all 0.3s ease;
-}
+      th:nth-child(2),
+      td:nth-child(2) {
+        /* Avatar */
+        width: 6%;
+        min-width: 70px;
+        text-align: center;
+      }
 
-tbody tr:last-child {
-  border-bottom: none;
-}
+      th:nth-child(3),
+      td:nth-child(3) {
+        /* Name */
+        width: 14%;
+        min-width: 130px;
+      }
 
-tbody tr:hover {
-  background: #f8f9ff;
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-}
+      th:nth-child(4),
+      td:nth-child(4) {
+        /* Email */
+        width: 18%;
+        min-width: 180px;
+      }
 
-td {
-  padding: 16px;
-  font-size: 14px;
-  color: #2d3748;
-  vertical-align: middle;
-}
+      th:nth-child(5),
+      td:nth-child(5) {
+        /* Role */
+        width: 10%;
+        min-width: 90px;
+      }
 
-td.buttons {
-  white-space: nowrap;
-}
+      th:nth-child(6),
+      td:nth-child(6) {
+        /* Address */
+        width: 20%;
+        min-width: 150px;
+      }
 
-.avatar {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #e2e8f0;
-  transition: all 0.3s ease;
-}
+      th:nth-child(7),
+      td:nth-child(7) {
+        /* Status */
+        width: 9%;
+        min-width: 80px;
+      }
 
-.avatar:hover {
-  transform: scale(1.15);
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
+      th:nth-child(8),
+      td:nth-child(8) {
+        /* Actions */
+        width: 18%;
+        min-width: 240px;
+      }
 
-/* Remove default link styling */
-a {
-  text-decoration: none;
-  display: inline-block;
-}
+      /* Table Body */
+      tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+      }
 
-button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-right: 6px;
-  display: inline-block;
-  vertical-align: middle;
-}
+      tbody tr:last-child {
+        border-bottom: none;
+      }
 
-button:last-child {
-  margin-right: 0;
-}
+      tbody tr:hover {
+        background: #f8f9ff;
+        transform: scale(1.005);
+      }
 
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
+      td {
+        padding: 16px;
+        font-size: 14px;
+        color: #2d3748;
+        vertical-align: middle;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-button:active {
-  transform: translateY(0);
-}
+      /* Allow wrapping for address */
+      td:nth-child(6) {
+        white-space: normal;
+        word-wrap: break-word;
+        line-height: 1.5;
+      }
 
-.edit {
-  background: #4299e1;
-  color: white;
-}
+      /* Keep other columns single line */
+      td:nth-child(1),
+      td:nth-child(3),
+      td:nth-child(4),
+      td:nth-child(5),
+      td:nth-child(7) {
+        white-space: nowrap;
+      }
 
-.edit:hover {
-  background: #3182ce;
-}
+      /* Avatar */
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s ease;
+        display: block;
+        margin: 0 auto;
+      }
 
-.block {
-  background: #fc8181;
-  color: white;
-}
+      .avatar:hover {
+        transform: scale(1.15);
+        border-color: #667eea;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
 
-.block:hover {
-  background: #f56565;
-}
+      /* Buttons Container */
+      .buttons {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
 
-.unblock {
-  background: #48bb78;
-  color: white;
-}
+      .buttons a {
+        text-decoration: none;
+      }
 
-.unblock:hover {
-  background: #38a169;
-}
+      /* Buttons */
+      button {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 400;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+      }
 
-.delete {
-  background: #e53e3e;
-  color: white;
-}
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
 
-.delete:hover {
-  background: #c53030;
-}
+      button:active {
+        transform: translateY(0);
+      }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .content {
-    margin-left: 0;
-    padding: 20px;
-  }
-}
+      .edit {
+        background: #4299e1;
+        color: white;
+      }
 
-@media (max-width: 768px) {
-  .content {
-    padding: 15px;
-  }
+      .edit:hover {
+        background: #3182ce;
+        box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+      }
 
-  h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
+      .block {
+        background: #fc8181;
+        color: white;
+      }
 
-  table {
-    font-size: 12px;
-    border-radius: 12px;
-  }
+      .block:hover {
+        background: #f56565;
+        box-shadow: 0 4px 12px rgba(252, 129, 129, 0.4);
+      }
 
-  th, td {
-    padding: 12px 8px;
-  }
+      .unblock {
+        background: #48bb78;
+        color: white;
+      }
 
-  .avatar {
-    width: 35px;
-    height: 35px;
-  }
+      .unblock:hover {
+        background: #38a169;
+        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+      }
 
-  button {
-    padding: 6px 12px;
-    font-size: 11px;
-    margin-right: 4px;
-  }
-}
+      .delete {
+        background: #e53e3e;
+        color: white;
+      }
 
-@media (max-width: 480px) {
-  th, td {
-    padding: 10px 6px;
-    font-size: 11px;
-  }
+      .delete:hover {
+        background: #c53030;
+        box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+      }
 
-  button {
-    padding: 5px 10px;
-    font-size: 10px;
-    margin-right: 3px;
-  }
-}</style>
+      /* Empty State */
+      tbody tr td[colspan="8"] {
+        text-align: center;
+        padding: 40px 20px;
+        font-size: 15px;
+        color: #718096;
+        font-weight: 500;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1400px) {
+        .content {
+          margin-left: 250px;
+          padding: 30px 20px;
+        }
+
+        table {
+          max-width: 100%;
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .content {
+          margin-left: 0;
+          padding: 20px 15px;
+        }
+
+        h1 {
+          font-size: 24px;
+          margin-bottom: 20px;
+        }
+
+        table {
+          table-layout: auto;
+          font-size: 13px;
+        }
+
+        th,
+        td {
+          padding: 12px 10px;
+          font-size: 12px;
+        }
+
+        .avatar {
+          width: 35px;
+          height: 35px;
+        }
+
+        button {
+          padding: 6px 10px;
+          font-size: 11px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 15px 10px;
+        }
+
+        h1 {
+          font-size: 20px;
+        }
+
+        table {
+          border-radius: 10px;
+        }
+
+        th,
+        td {
+          padding: 10px 8px;
+          font-size: 11px;
+        }
+
+        .avatar {
+          width: 30px;
+          height: 30px;
+        }
+
+        button {
+          padding: 5px 8px;
+          font-size: 10px;
+        }
+
+        .buttons {
+          gap: 4px;
+        }
+      }
+
+      /* Smooth Scrolling */
+      @media (max-width: 1024px) {
+        table {
+          display: block;
+          overflow-x: auto;
+          white-space: nowrap;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        table thead,
+        table tbody,
+        table tr {
+          display: table;
+          width: 100%;
+          table-layout: fixed;
+        }
+      }
+    </style>
   </head>
   <body>
     {{ template "sidebar" . }}
@@ -284,7 +423,6 @@ button:active {
     </div>
 
     <script>
-      // Toggle Block / Unblock
       function toggleBlock(userId, shouldBlock) {
         const url = shouldBlock
           ? `/admin/users/${userId}/block`
@@ -292,23 +430,15 @@ button:active {
 
         fetch(url, { method: "POST" })
           .then((res) => {
-            if (res.ok) {
-              window.location.reload();
-            } else {
-              alert("Failed to update user status");
-            }
+            if (res.ok) window.location.reload();
+            else alert("Failed to update user status");
           })
-          .catch((err) => {
-            console.error("Error:", err);
-            alert("An error occurred. Please try again.");
-          });
+          .catch(() => alert("An error occurred."));
       }
 
-      // Delete User
       function deleteUser(userId) {
-        if (!confirm("Are you sure you want to delete this user?")) {
-          return;
-        }
+        if (!confirm("Are you sure you want to delete this user?")) return;
+
         fetch(`/admin/users/${userId}`, { method: "DELETE" })
           .then((res) => {
             if (res.ok) {
@@ -318,10 +448,7 @@ button:active {
               alert("Failed to delete user.");
             }
           })
-          .catch((err) => {
-            console.error("Error:", err);
-            alert("An error occurred while deleting the user.");
-          });
+          .catch(() => alert("An error occurred while deleting the user."));
       }
     </script>
   </body>

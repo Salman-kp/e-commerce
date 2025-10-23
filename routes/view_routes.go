@@ -19,5 +19,8 @@ func AdminViewRoutes(r *gin.Engine) {
 
 		//---------USER EDTITE
 		view.GET("/users/edit/:id", controllers.ShowEditUserPage)
+		//---------- PRODUCT CREATE & UPDATE
+		view.GET("/products/create", controllers.ShowCreateProductPage)
+		view.GET("/products/edit/:id", controllers.ShowEditProductPage)
 	}
 }
