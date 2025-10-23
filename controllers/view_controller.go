@@ -17,15 +17,27 @@ func ShowLoginPage(c *gin.Context) {
 
 // ---------------- DASHBOARD ----------------
 func ShowDashboard(c *gin.Context) {
-	var totalUsers int64
+	var totalUsers,totalProducts,totalOrders  int64
+
+	// count total users
 	if err := config.DB.Model(&models.User{}).Count(&totalUsers).Error; err != nil {
-		totalUsers = 0 // fallback if query fails
+		totalUsers = 0
+	}
+	// Count total products
+	if err := config.DB.Model(&models.Product{}).Count(&totalProducts).Error; err != nil {
+		totalProducts = 0 
+	}
+	// count total orders
+	if err := config.DB.Model(&models.Order{}).Count(&totalOrders).Error; err != nil {
+		totalOrders = 0
 	}
 
 	c.HTML(http.StatusOK, "dashboard.html", gin.H{
-		"title":       "Admin Dashboard",
-		"total_users": totalUsers,
-		"Active":      "dashboard", // for sidebar highlighting
+		"title":          "Admin Dashboard",
+		"total_users":    totalUsers,
+		"total_products": totalProducts,
+		"total_orders":   totalOrders,
+		"Active": "dashboard", // for sidebar highlighting
 	})
 }
 

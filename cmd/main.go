@@ -40,6 +40,8 @@ func main() {
     routes.ProductRoutes(router)
     routes.WishlistRoutes(router)
     routes.CartRoutes(router)
+	routes.OrdeRoutes(router)
+	routes.PaymentRoutes(router)
 	
 	// Server port from .env
 	port := os.Getenv("PORT")
