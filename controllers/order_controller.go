@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"e-commerce/config"
+	"e-commerce/models"
 	"e-commerce/services"
 	"net/http"
 	"strconv"
@@ -78,31 +79,48 @@ func GetAllOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, orders)
 }
 
+
+
 // PUT /admin/order/:id - Admin update order status
 func UpdateOrderStatusAdmin(c *gin.Context) {
-	idParam := c.Param("id")
-	orderID, err := strconv.Atoi(idParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid order id"})
+	orderID := c.Param("id")
+	status := c.PostForm("status") 
+	var order models.Order
+	if err := config.DB.First(&order, orderID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
-
-	var req struct {
-		Status string `json:"status"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	order.Status = status
+	if err := config.DB.Save(&order).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update status"})
 		return
 	}
-
-	updatedOrder, err := services.UpdateOrderStatusAdmin(config.DB, uint(orderID), req.Status)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, updatedOrder)
+	c.JSON(http.StatusOK, gin.H{"message": "Status updated"})
 }
+
+
+
+// func UpdateOrderStatusAdmin(c *gin.Context) {
+// 	idParam := c.Param("id")
+// 	orderID, err := strconv.Atoi(idParam)
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid order id"})
+// 		return
+// 	}
+// 	var req struct {
+// 		Status string `json:"status"`
+// 	}
+// 	if err := c.ShouldBindJSON(&req); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 		return
+// 	}
+// 	updatedOrder, err := services.UpdateOrderStatusAdmin(config.DB, uint(orderID), req.Status)
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, updatedOrder)
+// }
 
 // GET /order/:id - Get specific order for logged-in user
 func GetOrder(c *gin.Context) {

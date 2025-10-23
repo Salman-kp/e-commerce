@@ -15,7 +15,6 @@ func ShowLoginPage(c *gin.Context) {
 		"title": "Login Page",
 	})
 }
-
 // ---------------- DASHBOARD ----------------
 func ShowDashboard(c *gin.Context) {
 	var totalUsers, totalProducts, totalOrders int64
@@ -42,6 +41,9 @@ func ShowDashboard(c *gin.Context) {
 	})
 }
 
+
+
+
 // ---------------- USERS ----------------
 func ShowUsersPage(c *gin.Context) {
 	var users []models.User
@@ -56,7 +58,6 @@ func ShowUsersPage(c *gin.Context) {
 		"Active": "users",
 	})
 }
-
 // ---------------- SHOW EDIT USER ----------------
 func ShowEditUserPage(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -93,15 +94,12 @@ func ShowProductsPage(c *gin.Context) {
 		"Active":   "products",
 	})
 }
-
-
 // ---------------- CREATE PRODUCT PAGE ----------------
 func ShowCreateProductPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "create_product.html", gin.H{
 		"title": "Add Product",
 	})
 }
-
 // ---------------- EDIT PRODUCT PAGE ----------------
 func ShowEditProductPage(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -124,11 +122,15 @@ func ShowEditProductPage(c *gin.Context) {
 
 
 
-
 // ---------------- ORDERS ----------------
 func ShowOrdersPage(c *gin.Context) {
+	var orders []models.Order
+	if err := config.DB.Preload("User").Preload("OrderItems").Order("id DESC").Find(&orders).Error; err != nil {
+		orders = []models.Order{}
+	}
 	c.HTML(http.StatusOK, "orders.html", gin.H{
-		"title":  "Orders Page",
+		"title":  "Manage Orders",
+		"orders": orders,
 		"Active": "orders",
 	})
 }

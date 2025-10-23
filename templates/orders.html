@@ -1,29 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>{{ .title }}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body{margin:0;font-family:Arial,sans-serif;display:flex;background:#f4f6f9;}
-    .content{flex-grow:1;padding:30px;margin-left:240px;}
-    h1{margin-bottom:25px;color:#1e293b;}
-    table{width:100%;border-collapse:collapse;background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
-    th,td{padding:12px;text-align:left;border-bottom:1px solid #ddd;}
-    th{background:#2563eb;color:white;}
-    tr:hover{background:#f1f5f9;}
-    @media(max-width:768px){.content{margin-left:0;padding:20px;} table{font-size:14px;}}
-  </style>
+<meta charset="UTF-8">
+<title>{{ .title }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  min-height: 100vh;
+}
+.content { margin-left: 250px; padding: 20px; min-height:100vh; }
+h1 { font-size:28px; color:#fff; margin-bottom:20px; font-weight:700; text-shadow:0 2px 4px rgba(0,0,0,0.15); }
+table {
+  width:100%; max-width:1500px; margin:0 auto; border-collapse:collapse;
+  background: rgba(255,255,255,0.98); border-radius:14px; overflow:hidden;
+  box-shadow:0 15px 40px rgba(0,0,0,0.25);
+}
+thead { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
+th, td {
+  padding:14px 12px;
+  font-size:13px;
+  text-align:left;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+th { text-transform:uppercase; letter-spacing:0.5px; }
+tbody tr { border-bottom:1px solid #f1f5f9; transition: all 0.3s ease; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:#f8f9ff; transform:scale(1.002); }
+.status-select { padding:5px 8px; border-radius:6px; border:1.5px solid #e2e8f0; cursor:pointer; font-size:13px; transition: all 0.2s ease; }
+.status-select:focus { outline:none; border-color:#667eea; box-shadow:0 0 0 2px rgba(102,126,234,0.2);}
+button.update-btn { padding:5px 10px; margin-left:5px; background:#4299e1; color:white; border:none; border-radius:6px; cursor:pointer; transition: all 0.3s ease; }
+button.update-btn:hover { background:#3182ce; }
+/* make Action column contents flex */
+td.action-cell { display:flex; gap:5px; align-items:center; flex-wrap:wrap; min-width:180px; }
+/* Responsive */
+@media (max-width:1024px) { .content{margin-left:0;padding:15px;} th,td{padding:10px 8px;font-size:12px;} }
+@media (max-width:768px){ table{display:block;overflow-x:auto;} table thead,table tbody,table tr{display:table;width:100%;} td.action-cell { min-width:auto; } }
+</style>
 </head>
 <body>
 {{ template "sidebar" . }}
-  <div class="content">
-    <h1>Orders</h1>
-    <table>
-      <tr><th>ID</th><th>Product</th><th>User</th><th>Status</th></tr>
-      <tr><td>1</td><td>Product 1</td><td>John Doe</td><td>Pending</td></tr>
-      <tr><td>2</td><td>Product 2</td><td>Jane Smith</td><td>Shipped</td></tr>
-    </table>
-  </div>
+<div class="content">
+<h1>Orders</h1>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Customer</th>
+<th>Address</th>
+<th>Total</th>
+<th>Status</th>
+<th>Items</th>
+<th>Created</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+{{ range .orders }}
+<tr>
+<td>{{ .ID }}</td>
+<td>{{ .User.FullName }}</td>
+<td style="white-space:normal;">{{ .Address }}</td>
+<td>₹{{ .TotalAmount }}</td>
+<td>{{ .Status }}</td>
+<td>{{ len .OrderItems }}</td>
+<td>{{ .CreatedAt.Format "2006-01-02 15:04" }}</td>
+<td class="action-cell">
+<select class="status-select" id="status-{{ .ID }}">
+  <option value="pending" {{ if eq .Status "pending" }}selected{{ end }}>Pending</option>
+  <option value="processing" {{ if eq .Status "processing" }}selected{{ end }}>Processing</option>
+  <option value="shipped" {{ if eq .Status "shipped" }}selected{{ end }}>Shipped</option>
+  <option value="delivered" {{ if eq .Status "delivered" }}selected{{ end }}>Delivered</option>
+</select>
+<button class="update-btn" onclick="updateStatus('{{ .ID }}')">Update</button>
+<span id="msg-{{ .ID }}" style="font-size:12px;margin-left:5px;"></span>
+</td>
+</tr>
+{{ else }}
+<tr><td colspan="8" style="text-align:center;">No orders found</td></tr>
+{{ end }}
+</tbody>
+</table>
+</div>
+
+<script>
+async function updateStatus(orderId){
+  const select = document.getElementById('status-' + orderId);
+  const status = select.value;
+  const msgSpan = document.getElementById('msg-' + orderId);
+
+  try {
+    const res = await fetch('/admin/orders/' + orderId, {
+      method:'PUT',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body: new URLSearchParams({status: status})
+    });
+    const data = await res.json();
+    if(res.ok){
+      msgSpan.style.color = 'green';
+      msgSpan.textContent = 'Updated';
+      
+      const row = select.closest('tr');
+      const statusCell = row.querySelector('td:nth-child(5)');
+      statusCell.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+      setTimeout(()=>msgSpan.textContent='',2000);
+    } else {
+      msgSpan.style.color = 'red';
+      msgSpan.textContent = data.error || 'Failed';
+    }
+  } catch(err){
+    msgSpan.style.color = 'red';
+    msgSpan.textContent = 'Error';
+  }
+}
+</script>
 </body>
 </html>
