@@ -67,7 +67,7 @@
 }
 
 .sidebar .logout {
-  margin-top: 300px;
+  margin-top: 230px;
   border: 2px solid #dc2626;
   color: #dc2626;
   font-weight: 600;
@@ -144,6 +144,9 @@
   </a>
   <a href="/view/orders" class="{{ if eq .Active "orders" }}active{{ end }}">
     <i class="fa-solid fa-receipt"></i> Orders
+  </a>
+  <a href="/view/profile" class="{{ if eq .Active "profile" }}active{{ end }}">
+    <i class="fa-solid fa-id-badge"></i> Profile
   </a>
   <div class="logout" id="logout-btn">
     <i class="fa-solid fa-right-from-bracket"></i> Logout

@@ -22,5 +22,10 @@ func AdminViewRoutes(r *gin.Engine) {
 		//---------- PRODUCT CREATE & UPDATE
 		view.GET("/products/create", controllers.ShowCreateProductPage)
 		view.GET("/products/edit/:id", controllers.ShowEditProductPage)
+
+		// ---------- ADMIN PROFILE ----------
+		view.GET("/profile", controllers.ShowAdminProfilePage)
+		view.GET("/profile/edit", controllers.ShowEditAdminProfilePage)
+		view.POST("/profile/update", controllers.UpdateAdminProfile)
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"e-commerce/models"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,7 +44,6 @@ func ShowDashboard(c *gin.Context) {
 
 
 
-
 // ---------------- USERS ----------------
 func ShowUsersPage(c *gin.Context) {
 	var users []models.User
@@ -77,7 +77,6 @@ func ShowEditUserPage(c *gin.Context) {
 		"user":  user,
 	})
 }
-
 
 
 
@@ -121,7 +120,6 @@ func ShowEditProductPage(c *gin.Context) {
 }
 
 
-
 // ---------------- ORDERS ----------------
 func ShowOrdersPage(c *gin.Context) {
 	var orders []models.Order
@@ -145,4 +143,115 @@ func MethodOverride() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+
+// ---------------- ADMIN PROFILE ----------------
+func ShowAdminProfilePage(c *gin.Context) {
+	userIDValue, exists := c.Get("userID")
+	if !exists {
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	id, ok := userIDValue.(int)
+	if !ok {
+		c.String(http.StatusInternalServerError, "Invalid admin ID type")
+		return
+	}
+	adminID := uint(id)
+
+	var admin models.User
+	if err := config.DB.First(&admin, adminID).Error; err != nil {
+		c.String(http.StatusInternalServerError, "Failed to load admin details")
+		return
+	}
+
+	c.HTML(http.StatusOK, "admin_profile.html", gin.H{
+		"title":  "Admin Profile",
+		"admin":  admin,
+		"Active": "profile",
+	})
+}
+func ShowEditAdminProfilePage(c *gin.Context) {
+	userIDValue, exists := c.Get("userID")
+	if !exists {
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	id, ok := userIDValue.(int)
+	if !ok {
+		c.String(http.StatusInternalServerError, "Invalid admin ID type")
+		return
+	}
+	adminID := uint(id)
+
+	var admin models.User
+	if err := config.DB.First(&admin, adminID).Error; err != nil {
+		c.String(http.StatusInternalServerError, "Failed to load admin data")
+		return
+	}
+
+	c.HTML(http.StatusOK, "edit_admin_profile.html", gin.H{
+		"title": "Edit Profile",
+		"admin": admin,
+	})
+}
+func UpdateAdminProfile(c *gin.Context) {
+	userIDValue, exists := c.Get("userID")
+	if !exists {
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	id, ok := userIDValue.(int)
+	if !ok {
+		c.String(http.StatusInternalServerError, "Invalid admin ID type")
+		return
+	}
+	adminID := uint(id)
+
+	var admin models.User
+	if err := config.DB.First(&admin, adminID).Error; err != nil {
+		c.String(http.StatusInternalServerError, "Failed to fetch admin record")
+		return
+	}
+
+	fullName := strings.TrimSpace(c.PostForm("full_name"))
+	email := strings.TrimSpace(c.PostForm("email"))
+	address := strings.TrimSpace(c.PostForm("address"))
+	avatar := strings.TrimSpace(c.PostForm("avatar_url"))
+
+	if fullName == "" || email == "" {
+		c.HTML(http.StatusBadRequest, "edit_admin_profile.html", gin.H{
+			"title": "Edit Profile",
+			"admin": admin,
+			"error": "Full name and email cannot be empty.",
+		})
+		return
+	}
+
+	if !strings.Contains(email, "@") || !strings.Contains(email, ".") {
+		c.HTML(http.StatusBadRequest, "edit_admin_profile.html", gin.H{
+			"title": "Edit Profile",
+			"admin": admin,
+			"error": "Invalid email format.",
+		})
+		return
+	}
+
+	admin.FullName = fullName
+	admin.Email = email
+	admin.Address = address
+	if avatar != "" {
+		admin.AvatarURL = &avatar
+	}
+
+	if err := config.DB.Save(&admin).Error; err != nil {
+		c.String(http.StatusInternalServerError, "Failed to update admin details")
+		return
+	}
+
+	c.Redirect(http.StatusFound, "/view/profile")
 }
