@@ -74,6 +74,8 @@ td.action-cell { display:flex; gap:5px; align-items:center; flex-wrap:wrap; min-
   <option value="processing" {{ if eq .Status "processing" }}selected{{ end }}>Processing</option>
   <option value="shipped" {{ if eq .Status "shipped" }}selected{{ end }}>Shipped</option>
   <option value="delivered" {{ if eq .Status "delivered" }}selected{{ end }}>Delivered</option>
+    <option value="delivered" {{ if eq .Status "cancelled" }}selected{{ end }}>Cancelled</option>
+
 </select>
 <button class="update-btn" onclick="updateStatus('{{ .ID }}')">Update</button>
 <span id="msg-{{ .ID }}" style="font-size:12px;margin-left:5px;"></span>

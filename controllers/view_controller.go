@@ -125,7 +125,7 @@ func ShowEditProductPage(c *gin.Context) {
 // ---------------- ORDERS ----------------
 func ShowOrdersPage(c *gin.Context) {
 	var orders []models.Order
-	if err := config.DB.Preload("User").Preload("OrderItems").Order("id DESC").Find(&orders).Error; err != nil {
+	if err := config.DB.Preload("User").Preload("OrderItems").Order("id ASC").Find(&orders).Error; err != nil {
 		orders = []models.Order{}
 	}
 	c.HTML(http.StatusOK, "orders.html", gin.H{

@@ -68,7 +68,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 	//Set accessToken in cookie
-	c.SetCookie("access_token", accessToken, 30*70, "/", "localhost", false, true) // 30 minutes
+	c.SetCookie("access_token", accessToken, 30*120, "/", "localhost", false, true) // 30 minutes
 	
 	if role == "admin" {
 		c.Redirect(http.StatusSeeOther, "/view/dashboard")
