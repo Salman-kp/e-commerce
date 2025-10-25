@@ -2,31 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>{{ .title }}</title>
+<title>Admin Orders</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: "Inter", sans-serif;
-  background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-  min-height: 100vh;
-}
+body { font-family: "Inter", sans-serif; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh;}
 .content { margin-left: 250px; padding: 20px; min-height:100vh; }
 h1 { font-size:28px; color:#fff; margin-bottom:20px; font-weight:700; text-shadow:0 2px 4px rgba(0,0,0,0.15); }
-table {
-  width:100%; max-width:1500px; margin:0 auto; border-collapse:collapse;
-  background: rgba(255,255,255,0.98); border-radius:14px; overflow:hidden;
-  box-shadow:0 15px 40px rgba(0,0,0,0.25);
-}
+table { width:100%; max-width:1500px; margin:0 auto; border-collapse:collapse; background: rgba(255,255,255,0.98); border-radius:14px; overflow:hidden; box-shadow:0 15px 40px rgba(0,0,0,0.25);}
 thead { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
-th, td {
-  padding:14px 12px;
-  font-size:13px;
-  text-align:left;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-th { text-transform:uppercase; letter-spacing:0.5px; }
+th, td { padding:14px 12px; font-size:13px; text-align:left; overflow:hidden; text-overflow:ellipsis;}
+th { text-transform:uppercase; letter-spacing:0.5px;}
 tbody tr { border-bottom:1px solid #f1f5f9; transition: all 0.3s ease; }
 tbody tr:last-child { border-bottom:none; }
 tbody tr:hover { background:#f8f9ff; transform:scale(1.002); }
@@ -34,15 +20,14 @@ tbody tr:hover { background:#f8f9ff; transform:scale(1.002); }
 .status-select:focus { outline:none; border-color:#667eea; box-shadow:0 0 0 2px rgba(102,126,234,0.2);}
 button.update-btn { padding:5px 10px; margin-left:5px; background:#4299e1; color:white; border:none; border-radius:6px; cursor:pointer; transition: all 0.3s ease; }
 button.update-btn:hover { background:#3182ce; }
-/* make Action column contents flex */
 td.action-cell { display:flex; gap:5px; align-items:center; flex-wrap:wrap; min-width:180px; }
-/* Responsive */
 @media (max-width:1024px) { .content{margin-left:0;padding:15px;} th,td{padding:10px 8px;font-size:12px;} }
 @media (max-width:768px){ table{display:block;overflow-x:auto;} table thead,table tbody,table tr{display:table;width:100%;} td.action-cell { min-width:auto; } }
 </style>
 </head>
 <body>
-{{ template "sidebar" . }}
+      {{ template "sidebar" . }}
+
 <div class="content">
 <h1>Orders</h1>
 <table>
@@ -60,12 +45,12 @@ td.action-cell { display:flex; gap:5px; align-items:center; flex-wrap:wrap; min-
 </thead>
 <tbody>
 {{ range .orders }}
-<tr>
+<tr id="order-row-{{ .ID }}">
 <td>{{ .ID }}</td>
 <td>{{ .User.FullName }}</td>
 <td style="white-space:normal;">{{ .Address }}</td>
 <td>₹{{ .TotalAmount }}</td>
-<td>{{ .Status }}</td>
+<td id="status-cell-{{ .ID }}">{{ .Status }}</td>
 <td>{{ len .OrderItems }}</td>
 <td>{{ .CreatedAt.Format "2006-01-02 15:04" }}</td>
 <td class="action-cell">
@@ -87,26 +72,29 @@ td.action-cell { display:flex; gap:5px; align-items:center; flex-wrap:wrap; min-
 </div>
 
 <script>
-async function updateStatus(orderId){
+async function updateStatus(orderId) {
   const select = document.getElementById('status-' + orderId);
   const status = select.value;
   const msgSpan = document.getElementById('msg-' + orderId);
 
   try {
     const res = await fetch('/admin/orders/' + orderId, {
-      method:'PUT',
-      headers:{'Content-Type':'application/x-www-form-urlencoded'},
-      body: new URLSearchParams({status: status})
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: status })
     });
+
     const data = await res.json();
+
     if(res.ok){
       msgSpan.style.color = 'green';
       msgSpan.textContent = 'Updated';
-      
-      const row = select.closest('tr');
-      const statusCell = row.querySelector('td:nth-child(5)');
-      statusCell.textContent = status.charAt(0).toUpperCase() + status.slice(1);
 
+      // Update the table cell
+      const statusCell = document.getElementById('status-cell-' + orderId);
+      statusCell.textContent = data.Status || status;
+
+      // Clear message after 2 seconds
       setTimeout(()=>msgSpan.textContent='',2000);
     } else {
       msgSpan.style.color = 'red';

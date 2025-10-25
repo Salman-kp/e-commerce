@@ -45,47 +45,9 @@ func GetUserByIDHandler(c *gin.Context) {
 	})
 }
 
-// --------------------------- PUT: Update User ---------------------------
-func UpdateUserHandler(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-		return
-	}
-
-	var user models.User
-	if err := config.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
-
-	// Only update fields if not empty
-	if fullName := c.PostForm("full_name"); fullName != "" {
-		user.FullName = fullName
-	}
-	if role := c.PostForm("role"); role != "" {
-		user.Role = role
-	}
-	if address := c.PostForm("address"); address != "" {
-		user.Address = address
-	}
-	if avatarURL := c.PostForm("avatar_url"); avatarURL != "" {
-		user.AvatarURL = &avatarURL
-	}
-
-	if err := config.DB.Save(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
-		return
-	}
-
-	// Redirect after success
-	c.Redirect(http.StatusSeeOther, "/view/users")
-}
-
-//---------------------------------------jSON------
+// --------------------------- PUT: Update User POST FORM ---------------------------
 // func UpdateUserHandler(c *gin.Context) {
-// 	idParam := c.Param("id")
-// 	id, err := strconv.ParseUint(idParam, 10, 64)
+// 	id, err := strconv.Atoi(c.Param("id"))
 // 	if err != nil {
 // 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 // 		return
@@ -95,29 +57,63 @@ func UpdateUserHandler(c *gin.Context) {
 // 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 // 		return
 // 	}
-// 	var input struct {
-// 		FullName  string  `json:"full_name"`
-// 		Role      string  `json:"role"`
-// 		Address   string  `json:"address"`
-// 		AvatarURL *string `json:"avatar_url"`
+// 	// Only update fields if not empty
+// 	if fullName := c.PostForm("full_name"); fullName != "" {
+// 		user.FullName = fullName
 // 	}
-// 	if err := c.ShouldBindJSON(&input); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-// 		return
+// 	if role := c.PostForm("role"); role != "" {
+// 		user.Role = role
 // 	}
-// 	user.FullName = input.FullName
-// 	user.Role = input.Role
-// 	user.Address = input.Address
-// 	user.AvatarURL = input.AvatarURL
+// 	if address := c.PostForm("address"); address != "" {
+// 		user.Address = address
+// 	}
+// 	if avatarURL := c.PostForm("avatar_url"); avatarURL != "" {
+// 		user.AvatarURL = &avatarURL
+// 	}
 // 	if err := config.DB.Save(&user).Error; err != nil {
 // 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 // 		return
 // 	}
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"message": "User updated successfully",
-// 		"user":    user,
-// 	})
+// 	// Redirect after success
+// 	c.Redirect(http.StatusSeeOther, "/view/users")
 // }
+
+//---------------------------------------PUT: Update User jSON-------------
+func UpdateUserHandler(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+	var user models.User
+	if err := config.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	var input struct {
+		FullName  string  `json:"full_name"`
+		Role      string  `json:"role"`
+		Address   string  `json:"address"`
+		AvatarURL *string `json:"avatar_url"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+	user.FullName = input.FullName
+	user.Role = input.Role
+	user.Address = input.Address
+	user.AvatarURL = input.AvatarURL
+	if err := config.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User updated successfully",
+		"user":    user,
+	})
+}
 
 // --------------------------- POST: Block User ---------------------------
 func BlockUserHandler(c *gin.Context) {
