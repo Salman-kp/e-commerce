@@ -77,40 +77,55 @@
   <div class="container">
     <h2>Edit Product</h2>
     <form id="editProductForm">
-      <input type="hidden" name="ID" value="{{ .product.ID }}">
+      <input type="hidden" id="productID" value="{{ .product.ID }}">
 
       <label>Name</label>
-      <input type="text" name="Name" value="{{ .product.Name }}" required>
+      <input type="text" id="name" value="{{ .product.Name }}" required>
 
       <label>Description</label>
-      <textarea name="Description" rows="2" required>{{ .product.Description }}</textarea>
+      <textarea id="description" rows="2" required>{{ .product.Description }}</textarea>
 
       <label>Price</label>
-      <input type="number" name="Price" value="{{ .product.Price }}" required>
+      <input type="number" id="price" value="{{ .product.Price }}" required>
 
       <label>Stock Quantity</label>
-      <input type="number" name="StockQuantity" value="{{ .product.StockQuantity }}" required>
+      <input type="number" id="stock_quantity" value="{{ .product.StockQuantity }}" required>
 
       <label>Category</label>
-      <input type="text" name="Category" value="{{ .product.Category }}" required>
+      <input type="text" id="category" value="{{ .product.Category }}" required>
 
       <label>Image URL</label>
-      <input type="text" name="ImageURL" value="{{ .product.ImageURL }}" required>
+      <input type="text" id="image_url" value="{{ .product.ImageURL }}" required>
 
       <button type="button" onclick="submitForm()">Update Product</button>
     </form>
   </div>
 
   <script>
-    function submitForm(){
-      const form = document.getElementById('editProductForm');
-      const id = form.ID.value;
-      const data = new URLSearchParams(new FormData(form));
-      fetch(`/admin/products/${id}`, { method:'PUT', body:data })
-      .then(res=>{
-        if(res.ok) window.location.href='/view/products';
-        else alert('Failed to update product');
+    async function submitForm() {
+      const id = document.getElementById('productID').value;
+
+      const data = {
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        price: parseFloat(document.getElementById('price').value),
+        stock_quantity: parseInt(document.getElementById('stock_quantity').value),
+        category: document.getElementById('category').value,
+        image_url: document.getElementById('image_url').value
+      };
+
+      const res = await fetch(`/admin/products/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
       });
+
+      if (res.ok) {
+        window.location.href = '/view/products';
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert('⚠️ ' + (err.error || 'Failed to update product'));
+      }
     }
   </script>
 </body>

@@ -78,36 +78,58 @@
     <h2>Add Product</h2>
     <form id="createProductForm">
       <label>Name</label>
-      <input type="text" name="Name" required>
+      <input type="text" name="name" required>
 
       <label>Description</label>
-      <textarea name="Description" rows="2" required></textarea>
+      <textarea name="description" rows="2" required></textarea>
 
       <label>Price</label>
-      <input type="number" name="Price" required>
+      <input type="number" name="price" required>
 
       <label>Stock Quantity</label>
-      <input type="number" name="StockQuantity" required>
+      <input type="number" name="stock_quantity" required>
 
       <label>Category</label>
-      <input type="text" name="Category" required>
+      <input type="text" name="category" required>
 
       <label>Image URL</label>
-      <input type="text" name="ImageURL" required>
+      <input type="text" name="image_url" required>
 
       <button type="button" onclick="submitForm()">Create Product</button>
     </form>
   </div>
 
   <script>
-    function submitForm(){
+    async function submitForm(){
       const form = document.getElementById('createProductForm');
-      const data = new URLSearchParams(new FormData(form));
-      fetch('/admin/products',{method:'POST',body:data})
-      .then(res=>{
-        if(res.ok) window.location.href='/view/products';
-        else alert('Failed to create product');
-      });
+      const formData = new FormData(form);
+
+      const data = {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        price: parseFloat(formData.get('price')),
+        stock_quantity: parseInt(formData.get('stock_quantity')),
+        category: formData.get('category'),
+        image_url: formData.get('image_url')
+      };
+
+      try {
+        const res = await fetch('/admin/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          alert('✅ Product created successfully!');
+          window.location.href = '/view/products';
+        } else {
+          const err = await res.json();
+          alert('⚠️ Failed to create product: ' + (err.error || res.statusText));
+        }
+      } catch (err) {
+        alert('⚠️ Server error: ' + err.message);
+      }
     }
   </script>
 </body>
