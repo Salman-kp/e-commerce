@@ -34,52 +34,74 @@ func SignupHandler(c *gin.Context) {
 
 // ------------------ LOGIN ------------------
 func LoginHandler(c *gin.Context) {
-	// var body struct {
-	// 	Email    string `json:"email" binding:"required,email"`
-	// 	Password string `json:"password" binding:"required"`
-	// }
-	// if err := c.ShouldBindJSON(&body); err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	// 	return
-	// }
-	// accessToken, refreshToken, role, err := services.LoginService(config.DB, body.Email, body.Password)
-	// if err != nil {
-	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-	// 	return
-	// }
-
-	email := c.PostForm("email")
-	password := c.PostForm("password")
-
-	if email == "" || password == "" {
-		c.HTML(http.StatusBadRequest, "login.html", gin.H{
-			"title": "Login Page",
-			"error": "⚠️ Email and password cannot be empty",
-		})
+	var body struct {
+		Email    string `json:"email" binding:"required,email"`
+		Password string `json:"password" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	accessToken, role, err := services.LoginService(config.DB, email, password)
+	accessToken, role, err := services.LoginService(config.DB, body.Email, body.Password)
 	if err != nil {
-		c.HTML(http.StatusUnauthorized, "login.html", gin.H{
-			"title": "Login Page",
-			"error": "❌ Invalid email or password",
-		})
-		return
-	}
-	//Set accessToken in cookie
-	c.SetCookie("access_token", accessToken, 30*120, "/", "localhost", false, true) // 30 minutes
-	
-	if role == "admin" {
-		c.Redirect(http.StatusSeeOther, "/view/dashboard")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.HTML(http.StatusOK, "login.html", gin.H{
-		"title": "Login Page",
-		"error": "❌ Only admin users are allowed",
+	c.SetCookie("access_token", accessToken, 30*120, "/", "localhost", false, true) // 30 minutes
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":       "success",
+		"message":      "✅ Login successful",
+		"role":         role,
+		"access_token": accessToken,
 	})
 }
+
+//func LoginHandler(c *gin.Context) {
+// var body struct {
+// 	Email    string `json:"email" binding:"required,email"`
+// 	Password string `json:"password" binding:"required"`
+// }
+// if err := c.ShouldBindJSON(&body); err != nil {
+// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 	return
+// }
+// accessToken, refreshToken, role, err := services.LoginService(config.DB, body.Email, body.Password)
+// if err != nil {
+// 	c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+// 	return
+// }
+//----------------------------  postform---------------
+// 	email := c.PostForm("email")
+// 	password := c.PostForm("password")
+// 	if email == "" || password == "" {
+// 		c.HTML(http.StatusBadRequest, "login.html", gin.H{
+// 			"title": "Login Page",
+// 			"error": "⚠️ Email and password cannot be empty",
+// 		})
+// 		return
+// 	}
+// 	accessToken, role, err := services.LoginService(config.DB, email, password)
+// 	if err != nil {
+// 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{
+// 			"title": "Login Page",
+// 			"error": "❌ Invalid email or password",
+// 		})
+// 		return
+// 	}
+// 	//Set accessToken in cookie
+// 	c.SetCookie("access_token", accessToken, 30*120, "/", "localhost", false, true) // 30 minutes
+// 	if role == "admin" {
+// 		c.Redirect(http.StatusSeeOther, "/view/dashboard")
+// 		return
+// 	}
+// 	c.HTML(http.StatusOK, "login.html", gin.H{
+// 		"title": "Login Page",
+// 		"error": "❌ Only admin users are allowed",
+// 	})
+// }
 
 // ------------------ OTP ------------------
 func SendOTPHandler(c *gin.Context) {
